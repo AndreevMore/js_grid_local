@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>grid</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Andrii Kostitsyn grid</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- <link href="css/main.css" rel="stylesheet"> -->
+
+    <style>
+        table, th, td,tr{
+            border:  1px solid black;
+            text-align: center;
+            vertical-align: center;
+        }
+        table{
+            width: 100%;
+        }
+        caption{
+            width: 100%;
+            text-align: center;
+            padding-top: 10px;
+            padding-bottom: 20px;
+        }
+        th:not(:last-child),
+        button {
+            cursor: pointer;
+        }
+
+        th:not(:last-child):hover {
+            background: lightblue;
+        }
+        input{
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="control">
+        <caption>
+            <input type="text" size="30" placeholder="name" id="nameHolder"> 
+            <input type="text" size="10" placeholder="phone" id="phoneHolder">
+            <button id="btnAdd" class='btnAdd'>add</button>
+            <button id="btnDel" class='btnDel'>delete</button>
+        </caption>
+
+        <table id="grid" class="table table-striped table-hover table-bordered ">
+            <thead>
+                <tr>
+                    <th data-type="string">
+                        <span>
+                            name
+                        </span>
+                    </th>
+                    <th data-type="number">
+                        <span>
+                            phone
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+                            checkbox
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="userInfo"></tbody>
+        </table>
+    </div>
+    <div>
+        <button  id="toHome" onclick="window.location.href='index.html'">home page</button>
+    </div>
+
+<script>
+
+    function Grid(elem){
+        var self = this;
+        this.arrayUserPhone = [
+
+                {name : "natali", phone : 75453549},
+                {name : "kostik", phone : 44814546},
+                {name : "kate", phone : 333},
+                {name : "karot", phone : 121212},
+                {name : "mom", phone : 879878},
+                {name : "dad", phone : 8},
+                {name : "zet", phone : 45555},
+            ];
+        this.sortStatus = { 
+           sortTarget: '',
+           sortDirection:'' 
+        };
+
+        this.attachEvents = function (){
+            document.getElementById("btnAdd").addEventListener("click", this.addUserInfo);
+            document.getElementById("btnDel").addEventListener("click", this.deleteUserInfo);
+        }
+
+        this.string = function() {
+            self.tableSortByStrings(); 
+        };
+        
+        this.number = function() {
+            self.tableSortByPhones();
+        };
+        this.tableSortByStrings = function () {
+            var sortStatus = self.sortStatus;
+            if(sortStatus.sortTarget==='name' && sortStatus.sortDirection==='asc'){
+                self.arrayUserPhone.sort(function (a, b) {
+                if (a.name > b.name) {
+                    return 1;
+                }
+                if (a.name < b.name) {
+                    return -1;
+                }
+                    return 0;
+                });
+
+                sortStatus.sortTarget='name';
+                sortStatus.sortDirection='desc';
+
+            }else{
+                self.arrayUserPhone.sort(function (a, b) {
+                if (a.name < b.name) {
+                    return 1;
+                }
+                if (a.name > b.name) {
+                    return -1;
+                }
+                    return 0;
+                });
+                
+                sortStatus.sortTarget='name';
+                sortStatus.sortDirection='asc';
+
+            }
+
+            self.rebase();
+        };
+        this.tableSortByPhones = function () {
+            var sortStatus = self.sortStatus;
+            if(sortStatus.sortTarget==='phone' && sortStatus.sortDirection==='asc'){
+                self.arrayUserPhone.sort(function (a, b) {
+                    if (a.phone > b.phone) {
+                        return 1;
+                    }
+                    if (a.phone < b.phone) {
+                        return -1;
+                    }
+                        return 0;
+                });
+
+                sortStatus.sortTarget='phone';
+                sortStatus.sortDirection='desc';
+
+            }else{
+                self.arrayUserPhone.sort(function (a, b) {
+                    if (a.phone < b.phone) {
+                        return 1;
+                    }
+                    if (a.phone > b.phone) {
+                        return -1;
+                    }
+                        return 0;
+                });
+
+                sortStatus.sortTarget='phone';
+                sortStatus.sortDirection='asc';
+
+            }
+
+            self.rebase();
+        }
+        elem.onclick = function(e) {
+            var target = e.target;
+            var action = target.getAttribute('data-type');
+            if (action) {
+                self[action]();
+            }
+        };
+        this.rebase = function () {
+            var list = document.getElementById("userInfo");
+            for (var i = list.childNodes.length - 1; i >= 0; i--) {
+                list.removeChild(list.childNodes[i])
+            }
+
+            for (var i = 0; i < self.arrayUserPhone.length; i++) {
+                element = document.getElementById('userInfo');
+                element.insertAdjacentHTML("beforeEnd", '<td class="name">' + self.arrayUserPhone[i].name + '</td><td class="phone">' + self.arrayUserPhone[i].phone + '</td><td><input type="checkbox" class="chBx"</td>');
+            }
+        };
+        this.addUserInfo = function () {
+            console.log('1');
+            var valueName = document.getElementById("nameHolder").value,
+                valuePhone = document.getElementById("phoneHolder").value,
+                element = document.getElementById('userInfo');
+
+            if(valueName==='' || isNaN(valuePhone)!=false){
+                alert('заполните оба поля верно')
+            } else {
+                element.insertAdjacentHTML("beforeEnd", '<td class="name">' + valueName + '</td><td class="phone">' + valuePhone + '</td><td><input type="checkbox" class="chBx"</td>');    
+                obj = {name : valueName, phone : valuePhone};
+                self.arrayUserPhone.push(obj);
+            }
+        };
+    
+        this.deleteUserInfo = function () {
+            var element = document.getElementById('userInfo');
+            var c = document.getElementsByClassName('chBx');
+            var tableObj = element.rows;
+
+                for (var i = c.length - 1; i >= 0; i--) {
+                    if (c[i].checked) {
+                        c[i].parentElement.parentElement.remove();
+                    }
+                }
+
+                self.arrayUserPhone.length=0;
+
+                for (var i = 0; i < tableObj.length; i++){
+
+                    obj = {name : tableObj[i].cells[0].firstChild.nodeValue, phone : tableObj[i].cells[1].firstChild.nodeValue};
+                    self.arrayUserPhone.push(obj);
+                }
+        };
+
+        this.init = function(){
+            this.attachEvents();
+            this.rebase();
+        }
+    };
+
+
+   
+    var mainGrid = new Grid (document.getElementById('grid'));
+    mainGrid.init();
+
+</script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+
+</body>
+</html>
